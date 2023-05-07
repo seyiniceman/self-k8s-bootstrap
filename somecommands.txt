@@ -1,0 +1,21 @@
+kubeadm init --pod-network-cidr=172.31.0.0/16
+
+mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+kubeadm join 172.31.7.147:6443 --token pulvyz.pal2ik3pngvbdwls \
+        --discovery-token-ca-cert-hash sha256:82efa4a5b9ae2f2636bbd717c5d26b3bbfab42cc2f025680b21d597bfb0affc9
+
+WeaveNet
+
+kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+
+
+OR 
+
+Calico
+
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
+
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/custom-resources.yaml

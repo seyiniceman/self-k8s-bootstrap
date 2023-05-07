@@ -89,8 +89,8 @@ resource "aws_security_group" "ec2_security_group" {
 
     ingress {
     description = "k8s5 access"
-    from_port   = 30007
-    to_port     = 30007
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -144,7 +144,7 @@ data "aws_ami" "amazon_linux_2" {
 # launch the ec2 instance
 resource "aws_instance" "ec2_instance" {
   ami                    = data.aws_ami.amazon_linux_2.id
-  instance_type          = "t2.medium"
+  instance_type          = "t3.medium"
   subnet_id              = aws_default_subnet.default_az1.id
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
   key_name               = "Feb-Class"
