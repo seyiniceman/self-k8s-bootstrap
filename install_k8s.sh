@@ -13,6 +13,12 @@ gpgcheck=0
 EOF
 sudo yum update -y
 sudo yum install docker -y
+sudo yum -y install @maven
+sudo yum install git -y
+sudo yum install awscli -y
+wget https://get.helm.sh/helm-v3.2.4-linux-amd64.tar.gz
+tar -zxvf helm-v3.2.4-linux-amd64.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin/helm
 sudo yum install -y kubeadm kubelet kubectl
 sudo systemctl start docker
 sudo systemctl start kubelet
