@@ -3,18 +3,18 @@ provider "aws" {
   region                   = "us-east-2"
   shared_config_files      = ["/Users/austi/.aws/conf"]
   shared_credentials_files = ["/Users/austi/.aws/credentials"]
-  profile                  = "austinobioma-realcloud"
+  profile                  = "austin"
 }
 
 
 # Create a remote backend for your terraform 
 terraform {
   backend "s3" {
-    bucket         = "austinobioma-k8s-tfstate"
+    bucket         = "austins-k8s-tfstate"
     dynamodb_table = "k8s-state"
     key            = "LockID"
     region         = "us-east-1"
-    profile        = "austinobioma-realcloud"
+    profile        = "austin"
   }
 }
 
@@ -56,15 +56,15 @@ resource "aws_security_group" "ec2_security_group" {
   }
 
   ingress {
-    description = "k8s access"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
+    description = "k8s etcd access"
+    from_port   = 2379
+    to_port     = 2380
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description = "k8s1 access"
+    description = "k8s1 kubelete access"
     from_port   = 10250
     to_port     = 10250
     protocol    = "tcp"
@@ -72,7 +72,7 @@ resource "aws_security_group" "ec2_security_group" {
   }
 
   ingress {
-    description = "k8s2 access"
+    description = "k8s2 api server access"
     from_port   = 6443
     to_port     = 6443
     protocol    = "tcp"
@@ -88,9 +88,9 @@ resource "aws_security_group" "ec2_security_group" {
   }
 
     ingress {
-    description = "k8s5 access"
-    from_port   = 8080
-    to_port     = 8080
+    description = "k8s5 nodeport services access"
+    from_port   = 30000
+    to_port     = 32767
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -111,6 +111,22 @@ resource "aws_security_group" "ec2_security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  ingress {
+    description = "scheduler access"
+    from_port   = 10251
+    to_port     = 10251
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "controller access"
+    from_port   = 10252
+    to_port     = 10252
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
@@ -124,30 +140,23 @@ resource "aws_security_group" "ec2_security_group" {
 }
 
 
-# use data source to get a registered amazon linux 2 ami
-data "aws_ami" "amazon_linux_2" {
-  most_recent = true
-  owners      = ["amazon"]
-
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
-  }
-
-  filter {
-    name   = "name"
-    values = ["amzn2-ami-hvm*"]
-  }
+resource "tls_private_key" "self-eks" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
 }
 
+resource "aws_key_pair" "generated_key" {
+  key_name   = var.key_name
+  public_key = tls_private_key.self-eks.public_key_openssh
+}
 
 # launch the ec2 instance
 resource "aws_instance" "ec2_instance" {
-  ami                    = data.aws_ami.amazon_linux_2.id
+  ami                    = "ami-0f30a9c3a48f3fa79"
   instance_type          = "t3.medium"
   subnet_id              = aws_default_subnet.default_az1.id
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
-  key_name               = "Feb-Class"
+  key_name               = aws_key_pair.generated_key.key_name
   user_data              = file("install_k8s.sh")
   count                  = 3
 
@@ -156,7 +165,15 @@ resource "aws_instance" "ec2_instance" {
   }
 
 }
+
+
 # print the url of the container
 output "container_url" {
   value = ["${aws_instance.ec2_instance.*.public_ip}"]
+}
+
+# Print the Private Key
+output "private_key" {
+  value     = tls_private_key.self-eks.private_key_pem
+  sensitive = true
 }
