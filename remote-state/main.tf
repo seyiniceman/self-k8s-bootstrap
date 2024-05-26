@@ -1,10 +1,10 @@
 provider "aws" {
   region = "us-east-1"
-  profile= "austinobioma-realcloud"
+  profile= "austin"
 }
 
 resource "aws_s3_bucket" "terraform_state" {
-  bucket = "austinobioma-k8s-tfstate"
+  bucket = "austins-k8s-tfstate"
      
   lifecycle {
     prevent_destroy = true
