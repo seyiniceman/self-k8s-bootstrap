@@ -8,7 +8,7 @@ sudo kubeadm config images pull
 
 
 # Use this to initialize the cluster, remember to update the IP of the master
-sudo kubeadm init --apiserver-advertise-address="172.31.3.112" --apiserver-cert-extra-sans="172.31.3.112" --pod-network-cidr="172.31.0.0/16" --node-name "master" --ignore-preflight-errors Swap
+sudo kubeadm init --apiserver-advertise-address="172.31.12.108" --apiserver-cert-extra-sans="172.31.12.108" --pod-network-cidr="172.31.0.0/16" --node-name "master" --ignore-preflight-errors Swap
 
 
   mkdir -p $HOME/.kube
@@ -20,17 +20,26 @@ sudo kubeadm init --apiserver-advertise-address="172.31.3.112" --apiserver-cert-
 kubeadm join 172.31.3.112:6443 --token 3yu2aj.183kla97gobfnj3w \
         --discovery-token-ca-cert-hash sha256:6c08e0eec0ce261c180b508c157f4f982246c9f5d41f8235b90bb48620d6b809
 
-WeaveNet
+## Install helm
 
-kubectl apply -f https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
-
-
-OR 
+wget https://get.helm.sh/helm-v3.9.3-linux-amd64.tar.gz
+tar xvf helm-v3.9.3-linux-amd64.tar.gz
+sudo mv linux-amd64/helm /usr/local/bin
+rm helm-v3.9.3-linux-amd64.tar.gz
+rm -rf linux-amd64
+helm version
 
 Calico
 
-kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
+kubectl create namespace tigera-operator
+
+helm install calico projectcalico/tigera-operator --version v3.28.0 --namespace tigera-operator
+watch kubectl get pods -n calico-system
+
+OR
 
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/custom-resources.yaml
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
+
 
 Flannel
