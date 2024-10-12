@@ -33,7 +33,9 @@ Calico
 
 kubectl create namespace tigera-operator
 
-helm install calico projectcalico/tigera-operator --version v3.28.0 --namespace tigera-operator
+
+helm repo add projectcalico https://docs.tigera.io/calico/charts
+helm install calico projectcalico/tigera-operator --version v3.28.2 --namespace tigera-operator
 watch kubectl get pods -n calico-system
 
 OR
