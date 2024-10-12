@@ -20,6 +20,15 @@ sudo kubeadm init --apiserver-advertise-address="172.31.12.108" --apiserver-cert
 kubeadm join 172.31.3.112:6443 --token 3yu2aj.183kla97gobfnj3w \
         --discovery-token-ca-cert-hash sha256:6c08e0eec0ce261c180b508c157f4f982246c9f5d41f8235b90bb48620d6b809
 
+
+
+For Conainer Network Interface(CNI) You could either use Flannel, weavenet, Calico, Cilium, etc.\
+
+
+For Weavenet Run
+
+kubectl apply -f https://reweave.azurewebsites.net/k8s/v1.29/net.yaml
+
 ## Install helm
 
 wget https://get.helm.sh/helm-v3.9.3-linux-amd64.tar.gz
