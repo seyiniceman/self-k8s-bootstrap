@@ -15,19 +15,8 @@ sudo kubeadm init --apiserver-advertise-address="172.31.12.108" --apiserver-cert
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-# Remember to update according to your output. the token, the cert hash and teh ip
+For Container Network Interface(CNI) You could either use  Calico, Flannel, weavenet, Calico, Cilium, etc.\
 
-kubeadm join 172.31.3.112:6443 --token 3yu2aj.183kla97gobfnj3w \
-        --discovery-token-ca-cert-hash sha256:6c08e0eec0ce261c180b508c157f4f982246c9f5d41f8235b90bb48620d6b809
-
-
-
-For Conainer Network Interface(CNI) You could either use Flannel, weavenet, Calico, Cilium, etc.\
-
-
-For Weavenet Run
-
-kubectl apply -f https://reweave.azurewebsites.net/k8s/v1.29/net.yaml
 
 ## Install helm
 
@@ -53,4 +42,15 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/tigera-operator.yaml
 
 
-Flannel
+OR
+
+For Weavenet Run
+
+kubectl apply -f https://reweave.azurewebsites.net/k8s/v1.29/net.yaml
+
+
+
+# Remember to update according to your output. the token, the cert hash and teh ip To join your nodes to cluster
+
+kubeadm join 172.31.3.112:6443 --token 3yu2aj.183kla97gobfnj3w \
+        --discovery-token-ca-cert-hash sha256:6c08e0eec0ce261c180b508c157f4f982246c9f5d41f8235b90bb48620d6b809
