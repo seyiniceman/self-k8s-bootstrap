@@ -1,20 +1,18 @@
 # configured aws provider with proper credentials
 provider "aws" {
-  region                   = "us-east-2"
-  shared_config_files      = ["/Users/austi/.aws/conf"]
-  shared_credentials_files = ["/Users/austi/.aws/credentials"]
-  profile                  = "austin"
+  region = "eu-west-1"
+  profile= "Seyi"
 }
 
 
 # Create a remote backend for your terraform 
 terraform {
   backend "s3" {
-    bucket         = "austins-k8s-tfstate"
+    bucket         = "sstins-k8s-tfstate"
     dynamodb_table = "k8s-state"
     key            = "LockID"
-    region         = "us-east-1"
-    profile        = "austin"
+    region         = "eu-west-1"
+    profile        = "Seyi"
   }
 }
 
@@ -156,19 +154,19 @@ resource "aws_security_group" "ec2_security_group" {
 }
 
 
-resource "tls_private_key" "self-eks" {
+resource "tls_private_key" "Markpair" {
   algorithm = "RSA"
   rsa_bits  = 4096
 }
 
 resource "aws_key_pair" "generated_key" {
   key_name   = var.key_name
-  public_key = tls_private_key.self-eks.public_key_openssh
+  public_key = tls_private_key.Markpair.public_key_openssh
 }
 
 # launch the ec2 instance
 resource "aws_instance" "ec2_instance" {
-  ami                    = "ami-0f30a9c3a48f3fa79"
+  ami                    = "ami-0d64bb532e0502c46"
   instance_type          = "t3.medium"
   subnet_id              = aws_default_subnet.default_az1.id
   vpc_security_group_ids = [aws_security_group.ec2_security_group.id]
@@ -190,6 +188,6 @@ output "container_url" {
 
 # Print the Private Key
 output "private_key" {
-  value     = tls_private_key.self-eks.private_key_pem
+  value     = tls_private_key.Markpair.private_key_pem
   sensitive = true
 }
